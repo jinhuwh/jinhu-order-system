@@ -1,0 +1,7 @@
+﻿<FilesMatch "\.(bak|sql|zip|log|md|old|backup)$">
+    Require all denied
+</FilesMatch>
+<Files "config.local.php">
+    Require all denied
+</Files>
+Options -Indexes 

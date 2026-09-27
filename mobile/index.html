@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="0;url=index.php">
+    <title>跳转中...</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh; margin: 0;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .box { text-align: center; padding: 40px; }
+        .box h1 { font-size: 24px; margin-bottom: 10px; }
+        .box p { opacity: 0.8; }
+        .links { margin-top: 30px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .links a { 
+            padding: 14px 28px; border-radius: 30px; 
+            text-decoration: none; color: white; font-weight: 500;
+            background: rgba(255,255,255,0.2); transition: background 0.3s;
+        }
+        .links a:hover { background: rgba(255,255,255,0.3); }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🎯 广告订单管理系统</h1>
+        <p>正在跳转...</p>
+        <div class="links">
+            <a href="index.php">📱 手机/平板版</a>
+            <a href="../index.php">💻 电脑版</a>
+        </div>
+    </div>
+    <script>
+        // 自动跳转到移动版首页
+        if (!window.location.href.includes('index.html')) {
+            window.location.href = 'index.php';
+        }
+    </script>
+</body>
+</html>
