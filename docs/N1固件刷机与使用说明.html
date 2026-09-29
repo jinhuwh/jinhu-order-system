@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>金狐开单系统 N1 固件 · 刷机与使用说明（v2 瘦身通用版）</title>
+<style>
+  :root{--bg:#f5f7fa;--card:#fff;--tx:#1f2937;--tx2:#5b6b7c;--brand:#c62828;--br:#e5e9f0;--code:#f3f5f8;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.75 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif;}
+  .wrap{max-width:900px;margin:0 auto;padding:28px 18px 60px;}
+  header{background:linear-gradient(135deg,#c62828,#8e1c1c);color:#fff;border-radius:14px;padding:26px 28px;margin-bottom:22px;}
+  header h1{margin:0 0 8px;font-size:24px;letter-spacing:.5px;}
+  header .meta{font-size:13px;opacity:.9;}
+  .card{background:var(--card);border:1px solid var(--br);border-radius:12px;padding:20px 24px;margin-bottom:18px;}
+  h2{font-size:19px;margin:0 0 14px;padding-left:11px;border-left:4px solid var(--brand);}
+  h3{font-size:16px;margin:20px 0 10px;color:#374151;}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;}
+  th{background:#f0f3f7;text-align:left;padding:9px 12px;border:1px solid var(--br);font-weight:600;}
+  td{padding:8px 12px;border:1px solid var(--br);}
+  tr:nth-child(even) td{background:#fafbfd;}
+  code{background:var(--code);padding:2px 6px;border-radius:4px;font:13px/1.5 Consolas,Monaco,monospace;color:#b3242b;}
+  pre{background:#1e2430;color:#e6edf3;padding:14px 16px;border-radius:8px;overflow-x:auto;font:13px/1.6 Consolas,Monaco,monospace;}
+  pre code{background:none;color:inherit;padding:0;}
+  .warn{background:#fff7e6;border-left:4px solid #e8a33d;padding:12px 16px;border-radius:6px;margin:14px 0;font-size:14px;}
+  .ok{background:#eefaf1;border-left:4px solid #34a853;padding:12px 16px;border-radius:6px;margin:14px 0;font-size:14px;}
+  ol>li,ul>li{margin:7px 0;}
+  footer{text-align:center;color:var(--tx2);font-size:13px;margin-top:26px;}
+  a{color:var(--brand);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>金狐开单系统 N1 固件 · 刷机与使用说明</h1>
+  <div class="meta">适用设备：斐讯 N1（Amlogic S905D，arm64）｜固件版本 v2.0 瘦身通用版｜打包日期 2026-09-29</div>
+</header>
+
+<div class="card">
+  <h2>〇、两个固件版本，选哪个？</h2>
+  <table>
+    <tr><th></th><th>v2 瘦身通用版（推荐分发）</th><th>v1 完整归档版</th></tr>
+    <tr><td>文件名</td><td><code>n1-jinhu-firmware-slim-20260929.img.zst</code></td><td><code>n1-jinhu-firmware-20260929.img.zst</code></td></tr>
+    <tr><td>压缩包大小</td><td>约 3 GB</td><td>约 7.2 GB</td></tr>
+    <tr><td>解压后镜像</td><td>7 GiB</td><td>116.5 GiB</td></tr>
+    <tr><td>8G 存储 N1</td><td><b style="color:#34a853">✅ 可刷</b></td><td>❌ 刷不了</td></tr>
+    <tr><td>16G / 32G / 64G N1</td><td><b style="color:#34a853">✅ 可刷</b></td><td>❌（解压就占 116G）</td></tr>
+    <tr><td>128G N1</td><td>✅ 可刷</td><td>✅ 可刷</td></tr>
+    <tr><td>首次开机</td><td>自动扩容占满整块 eMMC</td><td>布局即全盘</td></tr>
+    <tr><td>PHP</td><td>仅 8.2（站点在用版本）</td><td>8.1 + 8.2 双版本</td></tr>
+    <tr><td>定位</td><td><b>社区分发 / 日常刷机</b></td><td>存档备查</td></tr>
+  </table>
+  <div class="ok">除上述差异外，两个版本的系统、业务软件、初始化机制完全一致。</div>
+</div>
+
+<div class="card">
+  <h2>一、固件包含什么</h2>
+  <table>
+    <tr><th>组件</th><th>版本 / 说明</th></tr>
+    <tr><td>操作系统</td><td>Armbian（Debian 系，arm64），kernel 6.6.157-ophub，已实机验证</td></tr>
+    <tr><td>Web 服务器</td><td>Nginx（已按高并发调优，实测 300 并发 0 错误）</td></tr>
+    <tr><td>PHP</td><td>8.2.33（含 fileinfo / imagick / opcache+JIT 等 19 项扩展）</td></tr>
+    <tr><td>数据库</td><td>MySQL 5.6（源码编译，已调优）</td></tr>
+    <tr><td>面板</td><td>宝塔 Linux 面板（如需 PHP 8.1，面板内 2 分钟装回）</td></tr>
+    <tr><td>业务系统</td><td>金狐开单系统（13 张表结构，<b>业务数据已清空</b>）</td></tr>
+    <tr><td>交换分区</td><td>2 GB（/swapfile，首次开机自动重建）</td></tr>
+  </table>
+  <div class="ok">
+    <b>已预置：</b>数据库 13 张表结构 + admin 管理员账号 + Nginx 站点配置 + 品牌横幅<br>
+    <b>未包含：</b>任何业务订单数据、任何个人身份信息、任何第三方密钥、任何内置后门
+  </div>
+</div>
+
+<div class="card">
+  <h2>二、刷机前准备</h2>
+  <h3>硬件</h3>
+  <ul>
+    <li>斐讯 N1 盒子一台（8G / 16G / 32G / 128G eMMC 均可）</li>
+    <li>N1 已能启动 Armbian（U盘或 eMMC 均可）；若还是安卓系统或已变砖，见「方式 B」</li>
+  </ul>
+  <h3>软件</h3>
+  <table>
+    <tr><th>工具</th><th>用途 / 获取</th></tr>
+    <tr><td>zstd</td><td>解压 .zst；Armbian 内置 <code>apt install zstd</code>，Windows 用 7-Zip 23+</td></tr>
+    <tr><td>sha256sum / Get-FileHash</td><td>校验镜像（系统内置）</td></tr>
+  </table>
+  <h3>镜像文件</h3>
+  <ul>
+    <li><code>n1-jinhu-firmware-slim-20260929.img.zst</code>（约 1.7 GB）</li>
+    <li><code>n1-jinhu-firmware-slim-20260929.img.zst.sha256</code>（校验文件）</li>
+  </ul>
+  <div class="warn">⚠️ 本镜像为 raw dd 格式，<b>不能用 USB Burning Tool 直接烧录</b>（它只认 aml 升级包）。刷机会<b>清空整块 eMMC</b>，请先备份。</div>
+</div>
+
+<div class="card">
+  <h2>三、刷机步骤</h2>
+  <h3>方式 A（推荐）：在已运行 Armbian 的 N1 上刷入</h3>
+  <p><b>步骤 1：下载并校验镜像</b></p>
+<pre><code>wget https://gitee.com/jinhuwh/jinhu-order-system/releases/.../n1-jinhu-firmware-slim-20260929.img.zst
+wget https://gitee.com/jinhuwh/jinhu-order-system/releases/.../n1-jinhu-firmware-slim-20260929.img.zst.sha256
+sha256sum -c n1-jinhu-firmware-slim-20260929.img.zst.sha256   # 必须输出 OK</code></pre>
+  <p><b>步骤 2：解压</b>（需约 7 GB 剩余空间）</p>
+<pre><code>zstd -d n1-jinhu-firmware-slim-20260929.img.zst
+# 得到 n1-jinhu-firmware-slim-20260929.img（7 GiB）</code></pre>
+  <p><b>步骤 3：写入 eMMC</b>（⚠️ 此步之后原系统即被覆盖）</p>
+<pre><code># N1 的 eMMC 设备为 /dev/mmcblk2
+dd if=n1-jinhu-firmware-slim-20260929.img of=/dev/mmcblk2 bs=4M status=progress conv=fsync
+sync
+reboot   # 拔掉U盘（如在U盘系统）后重启</code></pre>
+  <p>写入约 3-6 分钟。之后进入「四、首次开机自动初始化」。</p>
+  <h3>方式 B：全新 N1（安卓系统）或已变砖</h3>
+  <ol>
+    <li>先用 <b>USB Burning Tool 线刷任意 Armbian ophub 版</b>（社区通用教程，关键词「N1 刷 Armbian」）救到能启动 Linux</li>
+    <li>再按 <b>方式 A</b> 刷入本固件</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h2>四、首次开机：自动初始化 + 自动扩容</h2>
+  <p>第一次开机会自动执行初始化脚本（<code>/root/n1-firstboot.sh</code>，约 1-2 分钟），共 8 步：</p>
+  <table>
+    <tr><th>步骤</th><th>动作</th></tr>
+    <tr><td>1</td><td><b>根分区自动扩容</b>：7GiB 布局扩展到整块 eMMC（8G/16G/32G/128G 自适应），文件系统在线扩容</td></tr>
+    <tr><td>2</td><td>重置设备身份（machine-id + SSH host key 重新生成）</td></tr>
+    <tr><td>3</td><td>随机化系统 root 密码</td></tr>
+    <tr><td>4</td><td>随机化开单系统 admin 密码</td></tr>
+    <tr><td>5</td><td>随机化 MySQL root 密码</td></tr>
+    <tr><td>6</td><td>随机化宝塔面板端口、安全入口、密码</td></tr>
+    <tr><td>7</td><td>清理日志与操作痕迹</td></tr>
+    <tr><td>8</td><td>重建 2GB 交换分区，自我禁用</td></tr>
+  </table>
+  <p><b>凭据获取</b>：在 N1 本机（HDMI + 键盘）登录 <code>root</code>，执行：</p>
+<pre><code>cat /root/首次启动报告.txt</code></pre>
+  <div class="warn">📌 随机化的密码<b>只在 <code>/root/首次启动报告.txt</code> 中出现一次</b>，请立即记录，登录后<b>第一时间修改所有密码</b>。若 root 无法登录，可单用户模式重置或重新刷机。</div>
+</div>
+
+<div class="card">
+  <h2>五、初始化后的默认配置</h2>
+  <table>
+    <tr><th>项目</th><th>值</th></tr>
+    <tr><td>开单系统地址</td><td><code>http://&lt;N1的IP&gt;:88</code></td></tr>
+    <tr><td>开单系统管理员</td><td><code>admin</code> / 见首启报告</td></tr>
+    <tr><td>宝塔面板</td><td><code>http://&lt;N1的IP&gt;:&lt;端口&gt;/&lt;安全入口&gt;</code>（见首启报告）</td></tr>
+    <tr><td>宝塔用户名</td><td><code>jinhuwh</code> / 密码见首启报告</td></tr>
+    <tr><td>SSH</td><td>端口 22，root 登录，密码见首启报告</td></tr>
+    <tr><td>MySQL</td><td>端口 3306（仅本机），root 密码见首启报告</td></tr>
+  </table>
+<pre><code>ip addr show | grep 'inet '   # 查看本机 IP</code></pre>
+</div>
+
+<div class="card">
+  <h2>六、常见问题</h2>
+  <h3>Q1：我的 N1 是 8G 存储，能刷吗？</h3>
+  <p>✅ 能。镜像布局 7 GiB，为 8G eMMC（实际可用约 7.2-7.3 GiB）预留安全余量，首开自动扩容吃满全部空间。</p>
+  <h3>Q2：16G/32G 刷完浪费空间？</h3>
+  <p>不会，自动扩容会扩展到整块 eMMC。</p>
+  <h3>Q3：能用 USB Burning Tool 直接烧吗？</h3>
+  <p>❌ 不能。它只认 aml 升级包。全新机器按「方式 B」先线刷 Armbian 再刷本固件。</p>
+  <h3>Q4：刷机后无法开机 / 卡开机画面</h3>
+  <ul>
+    <li>多为原机 u-boot 被覆盖或分区错位：Burning Tool 线刷 Armbian ophub 包救回后重刷</li>
+    <li>检查电源（N1 需 12V/2A）</li>
+    <li>8G 机型请确认下载的是 slim 瘦身版</li>
+  </ul>
+  <h3>Q5：开机后 88 端口打不开</h3>
+  <ul>
+    <li>首次开机 1-2 分钟内初始化未完成，稍等再试</li>
+    <li><code>systemctl status nginx php-fpm-82</code>、<code>ps aux | grep mysqld</code>、<code>tail -50 /www/wwwlogs/*.error.log</code></li>
+  </ul>
+  <h3>Q6：忘记密码</h3>
+  <ul>
+    <li>MySQL root：宝塔 → 数据库 → root 密码</li>
+    <li>admin：宝塔 phpMyAdmin 改 <code>users</code> 表</li>
+    <li>宝塔密码：N1 本机 <code>bt 5</code> 重置</li>
+    <li>root：单用户模式重置</li>
+  </ul>
+  <h3>Q7：恢复出厂</h3>
+<pre><code>rm -f /var/lib/jinhu-firstboot.done
+reboot</code></pre>
+  <h3>Q8：SSH 提示 host key 变更</h3>
+  <p>正常（每台设备独立密钥），本地执行 <code>ssh-keygen -R &lt;N1的IP&gt;</code> 即可。</p>
+  <h3>Q9：需要 PHP 8.1</h3>
+  <p>宝塔面板 → 软件商店 → PHP 8.1 → 安装（约 2 分钟）。</p>
+</div>
+
+<div class="card">
+  <h2>七、安全建议（首次登录后立即执行）</h2>
+  <ol>
+    <li><b>修改 root 密码</b>：<code>passwd</code></li>
+    <li><b>修改宝塔密码</b>：面板 → 设置</li>
+    <li><b>修改开单系统 admin 密码</b>：系统内 → 个人设置</li>
+    <li><b>修改 MySQL root 密码</b>：宝塔 → 数据库</li>
+    <li><b>配置防火墙</b>：仅放行 88 + 宝塔端口，SSH 改非标端口或限来源 IP</li>
+    <li><b>开启 HTTPS</b></li>
+    <li><b>定期备份</b>：数据库 + 站点文件</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h2>八、技术规格</h2>
+  <table>
+    <tr><th>项目</th><th>规格</th></tr>
+    <tr><td>CPU</td><td>Amlogic S905D，4 核 Cortex-A5 @ 1.5GHz</td></tr>
+    <tr><td>内存</td><td>2GB</td></tr>
+    <tr><td>存储布局</td><td>p1 引导 511M（FAT32）+ p2 根分区（镜像 7GiB，首启扩容到全盘）</td></tr>
+    <tr><td>实际数据量</td><td>约 5.7 GB</td></tr>
+    <tr><td>系统</td><td>Armbian / Debian，kernel 6.6.157-ophub，arm64</td></tr>
+    <tr><td>eMMC 顺序读</td><td>冷读约 14 MB/s，热读 90+ MB/s（实测）</td></tr>
+    <tr><td>并发能力</td><td>300 并发 0 错误，&lt;100 用户近乎瞬时</td></tr>
+    <tr><td>网络</td><td>千兆有线</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>九、免责声明</h2>
+  <p>本固件为开源项目配套镜像，按「现状」提供，不附带任何明示或暗示的担保。使用者需自行承担刷机风险。刷机会清空 eMMC 全部数据，刷机前请备份。</p>
+</div>
+
+<footer>
+  <b>金狐文化传播有限公司</b> ｜ 长沙<br>
+  官网：<a href="https://www.jinhuwh.vip">https://www.jinhuwh.vip</a> ｜
+  开源仓库：<a href="https://gitee.com/jinhuwh/jinhu-order-system">https://gitee.com/jinhuwh/jinhu-order-system</a>
+</footer>
+
+</div>
+</body>
+</html>

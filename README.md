@@ -1,7 +1,7 @@
 # 金狐开单系统 (Jinhu Order System)
 
 > 为广告公司、图文店、中小商户打造的开源自部署订单管理 ERP。
-> 由长沙金狐文化在真实业务中打磨多年，从 3.7GB 内存的玩客云矿渣，到群晖 NAS，再到普通云主机都能跑。
+> 由长沙金狐文化在真实业务中打磨多年，从 3.7GB 内存的玩客云矿渣，到斐讯 N1，再到群晖 NAS 和普通云主机都能跑。
 
 ![PHP](https://img.shields.io/badge/PHP-7.4%20~%208.x-8892BF) ![MySQL](https://img.shields.io/badge/MySQL-5.6%2B%20%7C%20MariaDB%2010%2B-4479A1) ![License](https://img.shields.io/badge/License-MIT-green) ![部署](https://img.shields.io/badge/%E9%83%A8%E7%BD%B2-%E8%87%AA%E6%89%98%E7%AE%A1-blue)
 
@@ -33,6 +33,7 @@
 
 **低配友好（作者的偏执）**
 - 实测跑在 Amlogic S805 玩客云（4 核 A5 / 3.7GB 内存）+ PHP 7.4 + MySQL 5.6 上，100 人并发无压力
+- 斐讯 N1 固件版实测 300 并发 0 错误（见下方固件板块，刷机即用）
 - 群晖 NAS / 宝塔 / 1Panel / 普通虚拟主机均可部署
 - 无框架、无 Node 构建、无第三方服务依赖，上传即用
 
@@ -69,6 +70,33 @@
 ### 演示数据
 
 首次安装会自动生成一批演示订单 / 客户 / 收支记录（金额均经过验算），方便快速上手体验；正式使用时在后台直接删除即可。
+
+---
+
+## 📦 N1 固件版：刷机即用，开机就有整套系统
+
+**不想配环境？** 我们为斐讯 N1（Amlogic S905D）制作了**开箱即用固件**：Armbian + Nginx + PHP 8.2 + MySQL 5.6 + 宝塔面板 + 本系统，全部预装、调优、安全加固完毕，写入 eMMC 即为生产可用。
+
+| 项目 | 说明 |
+|---|---|
+| 适用设备 | 斐讯 N1 盒子（**8G / 16G / 32G / 128G eMMC 全系可刷**） |
+| 镜像大小 | 压缩包约 1.7 GB，解压 7 GiB（专为 8G 小盘机型做的瘦身布局） |
+| 首次开机 | 自动扩容占满整盘 → 重置设备身份 → **随机化所有密码** → 清理痕迹，凭据写入 `/root/首次启动报告.txt` |
+| 性能实测 | **300 并发 0 错误**，<100 用户近乎瞬时响应（eMMC + OPcache+JIT） |
+
+**三步刷机**（在已运行 Armbian 的 N1 上，全程约 5 分钟）：
+
+```bash
+sha256sum -c n1-jinhu-firmware-slim-*.img.zst.sha256    # 1. 校验
+zstd -d n1-jinhu-firmware-slim-*.img.zst                # 2. 解压
+dd if=n1-jinhu-firmware-slim-*.img of=/dev/mmcblk2 \
+   bs=4M status=progress conv=fsync && reboot           # 3. 写入 eMMC 并重启
+```
+
+📥 **固件下载**：[Gitee Releases](https://gitee.com/jinhuwh/jinhu-order-system/releases) ｜ [GitHub Releases](https://github.com/jinhuwh/jinhu-order-system/releases)
+📖 **详细刷机教程 / FAQ**：[docs/N1固件刷机与使用说明.md](docs/N1固件刷机与使用说明.md)
+
+> ⚠️ 刷机会清空 eMMC 全部数据。固件的初始化机制（身份重置 / 密码随机化 / 匿名统计策略）全部开源可审计，不含任何后门与内置凭据——每台设备的密码都由它自己首次开机时随机生成。
 
 ---
 
@@ -110,6 +138,7 @@
 ├── *.php                # 各业务页面（订单/客户/商品/财务/报表…）
 ├── mobile/              # 手机端界面
 ├── assets/              # 样式与前端脚本
+├── docs/                # N1 固件刷机说明等文档
 ├── vendor/              # PHP 依赖（已内置，无需 Composer）
 ├── tcpdf/               # PDF 导出库
 └── tools/               # 运维小工具
