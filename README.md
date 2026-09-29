@@ -98,6 +98,12 @@ dd if=n1-jinhu-firmware-slim-*.img of=/dev/mmcblk2 \
 
 > ⚠️ 刷机会清空 eMMC 全部数据。固件的初始化机制（身份重置 / 密码随机化 / 匿名统计策略）全部开源可审计，不含任何后门与内置凭据——每台设备的密码都由它自己首次开机时随机生成。
 
+> 🛠️ **已知问题（phpMyAdmin，不影响开单系统本身）**：镜像内置的 phpMyAdmin 为 5.1.1，与镜像的 PHP 8.2 不兼容——打开数据库页会报 `Function utf8_encode() is deprecated` 等错误。这是可选的数据库网页工具，开单系统与命令行 `mysql` 完全不受影响；需要用时在宝塔面板「软件商店 → phpMyAdmin」升级到 5.2.x，或 SSH 执行一行修复（保留原配置与访问入口）：
+>
+> ```bash
+> cd /tmp && wget -q https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.zip && unzip -q phpMyAdmin-5.2.1-all-languages.zip && E=$(ls -d /www/server/phpmyadmin/phpmyadmin_*/) && cp ${E}config.inc.php /tmp/pma.cfg && rm -rf "${E:?}"* && cp -a phpMyAdmin-5.2.1-all-languages/. $E && cp /tmp/pma.cfg ${E}config.inc.php && mkdir -p $E/tmp && chown www:www $E/tmp && systemctl reload php-fpm-82
+> ```
+
 ---
 
 ## 🧮 计价规则说明

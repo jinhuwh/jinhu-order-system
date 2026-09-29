@@ -182,6 +182,9 @@ reboot</code></pre>
   <p>正常（每台设备独立密钥），本地执行 <code>ssh-keygen -R &lt;N1的IP&gt;</code> 即可。</p>
   <h3>Q9：需要 PHP 8.1</h3>
   <p>宝塔面板 → 软件商店 → PHP 8.1 → 安装（约 2 分钟）。</p>
+  <h3>Q10：打开 phpMyAdmin 报 <code>Function utf8_encode() is deprecated</code></h3>
+  <p>镜像内置的 phpMyAdmin 5.1.1 与 PHP 8.2 不兼容导致，<b>只影响 phpMyAdmin 这个可选的数据库网页工具</b>，开单系统与命令行 <code>mysql</code> 不受影响。修复任选其一：宝塔「软件商店 → phpMyAdmin」升级到 5.2.x；或 SSH 执行一行修复（保留原配置与随机入口目录，执行后刷新页面重新登录）：</p>
+<pre><code>cd /tmp &amp;&amp; wget -q https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.zip &amp;&amp; unzip -q phpMyAdmin-5.2.1-all-languages.zip &amp;&amp; E=$(ls -d /www/server/phpmyadmin/phpmyadmin_*/) &amp;&amp; cp ${E}config.inc.php /tmp/pma.cfg &amp;&amp; rm -rf "${E:?}"* &amp;&amp; cp -a phpMyAdmin-5.2.1-all-languages/. $E &amp;&amp; cp /tmp/pma.cfg ${E}config.inc.php &amp;&amp; mkdir -p $E/tmp &amp;&amp; chown www:www $E/tmp &amp;&amp; systemctl reload php-fpm-82</code></pre>
 </div>
 
 <div class="card">
